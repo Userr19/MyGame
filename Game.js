@@ -9,6 +9,29 @@ function sizes(figure1, figure2) {
     return (rightestStart <= leftestEnd && hightestStart <= lowestEnd);
 }
 
+function gameOver() {
+    document.body.style.backgroundColor = "yellow";
+
+    let over = document.createElement("div");
+    over.style.width = "250px";
+    over.style.height = "150px";
+    over.style.backgroundColor = "red";
+    over.style.position = `absolute`;
+    over.style.top = "50%";
+    over.style.right = "50%";
+    
+
+    over.innerHTML = `<h1>  Game Over</h1>`;
+
+    canvas.remove();
+    document.body.append(over);
+
+setTimeout(() => {
+    document.location='rc_msg.php?remove=0';
+    document.location.reload();
+}, 2000);
+}
+
 class GameObj {
     constructor(y) {
         this._y = y;
@@ -152,10 +175,7 @@ function update() {
             data.args.forEach((obj) => obj.stop());
             data.cars.forEach((obj) => obj.stop());
             data.cars.shift();
-            alert("Game over");
-            document.location='rc_msg.php?remove=0';
-            document.location.reload();
-            
+            gameOver();
         }
     });
     if(data.hero._x < canvas.width/3 || data.hero._x + data.hero._width > 2*canvas.width/3) {
@@ -163,9 +183,8 @@ function update() {
         data.args.forEach((obj) => obj.stop());
         data.cars.forEach((obj) => obj.stop());
         data.cars.shift();
-        alert("Game over");
-        document.location='rc_msg.php?remove=0';
-        document.location.reload();
+        gameOver();
+
     }
 }
 
