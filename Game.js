@@ -9,9 +9,8 @@ function sizes(figure1, figure2) {
     return (rightestStart <= leftestEnd && hightestStart <= lowestEnd);
 }
 
-function gameOver() {
+function gameOver(score) {
     document.body.style.backgroundColor = "yellow";
-
     let over = document.createElement("div");
     over.style.width = "250px";
     over.style.height = "150px";
@@ -21,15 +20,25 @@ function gameOver() {
     over.style.right = "50%";
     
 
-    over.innerHTML = `<h1>  Game Over</h1>`;
-
+    over.innerHTML = `<h1>Game Over</h1> <br> <p><b>your score is ${score}</b></p>`;
+    
     canvas.remove();
+    if(!(document.body.hasAttribute("div"))) { 
     document.body.append(over);
-
-setTimeout(() => {
-    document.location='rc_msg.php?remove=0';
-    document.location.reload();
-}, 2000);
+    }
+    let button = document.createElement("button");
+    button.innerHTML = "<p><b> Try Again </b></p>"
+    button.style.width = "100px";
+    button.style.height = "50px";
+    button.style.backgroundColor = "green";
+    button.style.top = "40%";
+    button.style.position = "absolute";
+    button.style.right = "20%";
+    button.onclick = function() {
+        over.remove();
+        location.reload(true);
+    }
+    over.appendChild(button);
 }
 
 class GameObj {
@@ -120,12 +129,17 @@ class Hero extends GameObj{
     }
 }
 
+let score = 0;
+
+
 let data = {
     roads: [new road(0, 5)],
     cars: [new Car(-130)],
     args: [new Argelq(-50)],
     hero: new Hero()
 };
+
+
 
 function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -135,7 +149,9 @@ function draw() {
     context.fillRect(canvas.width - canvas.width/6, 0 ,canvas.width/6, canvas.height);
     context.fillStyle = "grey";
     context.fillRect(0, 0, canvas.width/6, canvas.height);
-
+    context.font = "20px arial";
+    context.fillStyle = "black";
+    context.fillText(`${score}`, 20, 20);
     
     data.roads.forEach((obj) => {obj.draw()});
     data.args.forEach((obj) => {obj.draw()});
@@ -152,7 +168,7 @@ function update() {
     if(data.roads.length > 2) {
         data.roads.shift();
     }
-    if(data.args.length > 5) {
+    if(data.args.length > 7) {
         data.args.shift();
     }
 
@@ -160,22 +176,24 @@ function update() {
         data.roads.push(new road(data.roads[data.roads.length - 1]._y - data.roads[data.roads.length - 1]._height + 10, 5));
     } 
     if(data.args[data.args.length - 1]._y >= 0) {
-        data.args.push(new Argelq(-canvas.height/4));
+        data.args.push(new Argelq(-canvas.height/6));
     } 
 
-    if(data.cars.length > 3) {
+    if(data.cars.length > 4) {
         data.cars.shift();
     }
-    if(data.cars[data.cars.length - 1]._y >= 0) {
-        data.cars.push(new Car(-canvas.width/3));
-    } 
+
+    if(data.cars.length != 0)
+     {if(data.cars[data.cars.length - 1]._y >= 0) {
+        data.cars.push(new Car(-canvas.height/3));
+    }} 
     data.cars.forEach((car) => {
         if(sizes(car, data.hero)) {
             data.roads.forEach((obj) => obj.stop());
             data.args.forEach((obj) => obj.stop());
             data.cars.forEach((obj) => obj.stop());
             data.cars.shift();
-            gameOver();
+            gameOver(score);
         }
     });
     if(data.hero._x < canvas.width/3 || data.hero._x + data.hero._width > 2*canvas.width/3) {
@@ -183,7 +201,8 @@ function update() {
         data.args.forEach((obj) => obj.stop());
         data.cars.forEach((obj) => obj.stop());
         data.cars.shift();
-        gameOver();
+        debugger;
+        gameOver(score);
 
     }
 }
@@ -211,6 +230,7 @@ document.addEventListener("keydown", (ev) => {
         data.roads.forEach((obj) => obj.go());
         data.args.forEach((obj) => obj.go());
         data.cars.forEach((obj) => obj.go());
+        score += 2;
     } 
     if(ev.code == "ArrowLeft") {
          data.hero.goLeft();
@@ -237,4 +257,4 @@ document.addEventListener("keydown", (ev) => {
 document.addEventListener("keyup", (ev) => {
     ans == false;
     data.hero.stop();
-})
+});
